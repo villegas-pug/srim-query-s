@@ -1010,6 +1010,7 @@ JOIN SimTramiteInm ti ON t.sNumeroTramite = ti.sNumeroTramite
 JOIN SimTipoTramite tt ON t.nIdTipoTramite = tt.nIdTipoTramite
 WHERE
    t.bCancelado = 0
+   AND t.bCulminado = 1
    AND ti.sEstadoActual = 'A'
    AND t.nIdTipoTramite IN (
       58  -- CCM

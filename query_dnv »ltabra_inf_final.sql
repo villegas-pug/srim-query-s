@@ -17,7 +17,10 @@ GO
 DROP TABLE IF EXISTS #dnv_informativas_inhabilitada
 SELECT
    [sNumDocInvalidaTmp] = CONCAT(sdi.sIdDocInvalida, ' N° ', sdi.sNumDocInvalida),
-   spna.*
+   spna.*,
+   [sTipoAlerta] = stt.sDescripcion,
+   sdi.sIdInstitucion,
+   [sObservaciones(SimDocInvalidacion)] = sdi.sObservaciones
    INTO #dnv_informativas_inhabilitada
 FROM SimPersonaNoAutorizada spna
 JOIN SimDocInvalidacion sdi ON spna.nIdDocInvalidacion = sdi.nIdDocInvalidacion
@@ -272,12 +275,172 @@ WHERE
 -- de la alerta migratoria en consideración al  Oficio N° 12001-10-2021-SUBCOMGEMPNPDIRASINT/OCN-INTERPOL-LIMA/DEPFCI, de fecha 16/10/2021, que en su contenido indica que el 
 -- ciudadano VEN si tiene antecedentes en su país.
 
-SELECT TOP 10 * FROM SimPasaporteAlertaDNV
-SELECT TOP 10 * FROM SimPersonaNoAutorizada
-SELECT * FROM SimTablaTipo
-
-SELECT * FROM SimDocumento sd WHERE sd.sIdDocumento = 'OTS'
-
-SELECT * FROM SimDocumento sd WHERE sd.sIdDocumento = 'OTS'
 
 --========================================================================================================================================== */
+
+
+
+--> Casos de alertas con error de digitación en nombres ...
+-- ========================================================================================================================================== */
+-- bActivo
+-- 0 → Habilitada
+-- 1 → Inhabilitada
+
+-- 1. ...
+DROP TABLE IF EXISTS #tmp_dnv
+SELECT 
+
+   [Num Doc Invalida] = CONCAT(sdi.sIdDocInvalida, ' N° ', sdi.sNumDocInvalida),
+   [Nombre] = spna.sNombre,
+   [Paterno] = spna.sPaterno,
+   [Materno] = spna.sMaterno,
+   [Sexo] = spna.sSexo,
+   [Documento] = spna.sIdDocumento,
+   [Num Doc Identidad] = CONCAT('''', spna.sNumDocIdentidad),
+   [Fecha Nacimiento] = spna.dFechaNacimiento,
+   [Pais Nacionalidad] = spna.sIdPaisNacionalidad,
+   [Fecha Emisión] = sdi.dFechaEmision,
+   [Motivo] = smi.sDescripcion,
+   [Tipo Alerta] = COALESCE(stt.sDescripcion, 'NO REGISTRA TIPO'),
+   [Observaciones] = spna.sObservaciones,
+   [Estado] = IIF(spna.bActivo = 1, 'Inhabilitado', 'Habilitado'),
+
+   -- Index
+   [#] = ROW_NUMBER() OVER (ORDER BY sdi.dFechaEmision ASC)
+
+   INTO #tmp_dnv
+FROM SimPersonaNoAutorizada spna
+RIGHT JOIN SimDocInvalidacion sdi ON spna.nIdDocInvalidacion = sdi.nIdDocInvalidacion
+LEFT JOIN SimMotivoInvalidacion smi ON spna.sIdMotivoInv = smi.sIdMotivoInv
+LEFT JOIN SimTablaTipo stt ON spna.sIdAlertaInv = stt.strequivalente
+WHERE
+   spna.bActivo = 1 -- Inhabilitada
+   AND stt.sDescripcion = 'ALERTA ES INFORMATIVA'
+   AND (spna.sIdPaisNacionalidad != 'NNN' AND spna.sIdPaisNacionalidad IS NOT NULL)
+   AND (spna.dFechaNacimiento != '1900-01-01 00:00:00.000' AND spna.dFechaNacimiento IS NOT NULL)
+
+
+-- 2. Final: Self Join `tmp` ...
+SELECT TOP 10 t1.*, t2.*
+FROM #tmp_dnv t1
+JOIN #tmp_dnv t2 ON t1.[Paterno] = t2.[Paterno]
+                    AND t1.[Materno] = t2.[Materno]
+                    AND CAST(t1.[Fecha Nacimiento] AS DATE) = CAST(t2.[Fecha Nacimiento] AS DATE)
+                    AND t1.[Pais Nacionalidad] = t2.[Pais Nacionalidad]
+                    AND DIFFERENCE(t1.Nombre, t2.Nombre) = 3
+WHERE
+   t1.[#] != t2.[#]
+   
+
+-- test 
+-- ==========================================================================================================================================
+
+/* 
+   → Alertas inhabilitadas que corresponda a impedimentos de salida por institución.
+-- ========================================================================================================================================== */
+
+-- bActivo
+-- 0 → Habilitada
+-- 1 → Inhabilitada
+
+-- 1
+DROP TABLE IF EXISTS #dnv_informativas_inhabilitada
+SELECT
+   [sNumDocInvalidaTmp] = CONCAT(sdi.sIdDocInvalida, ' N° ', sdi.sNumDocInvalida),
+   spna.*,
+   sdi.sIdDocInvalida,
+   sdi.sNumDocInvalida,
+   sdi.dFechaEmision,
+   sdi.dFechaRecepcion,
+   [sTipoAlerta] = stt.sDescripcion,
+   sdi.sIdInstitucion,
+   [sObservaciones(SimDocInvalidacion)] = sdi.sObservaciones
+   INTO #dnv_informativas_inhabilitada
+FROM SimPersonaNoAutorizada spna
+JOIN SimDocInvalidacion sdi ON spna.nIdDocInvalidacion = sdi.nIdDocInvalidacion
+LEFT JOIN SimTablaTipo stt ON spna.sIdAlertaInv = stt.strequivalente
+WHERE
+   spna.bActivo = 1 -- Inhabilitada
+
+-- 2. Final ...
+-- EXEC sp_help SimPersonaNoAutorizada
+-- DECLARE @obs VARCHAR(55) = '%impedimento%salida%'
+DECLARE @obs VARCHAR(55) = '%orden%captura%'
+SELECT
+
+   [Num Doc Invalida] = CONCAT(dnv.sIdDocInvalida, ' N° ', dnv.sNumDocInvalida),
+   [Nombre] = dnv.sNombre,
+   [Paterno] = dnv.sPaterno,
+   [Materno] = dnv.sMaterno,
+   [Sexo] = dnv.sSexo,
+   [Documento] = dnv.sIdDocumento,
+   [Num Doc Identidad] = CONCAT('''', dnv.sNumDocIdentidad),
+   [Fecha Nacimiento] = dnv.dFechaNacimiento,
+   [Pais Nacionalidad] = dnv.sIdPaisNacionalidad,
+   [Fecha Inicio Medida] = dnv.dFechaInicioMedida,
+   [Fecha Emisión] = dnv.dFechaEmision,
+   [Fecha Recepción] = dnv.dFechaRecepcion,
+   [Fecha Cancelación DNV] = dnv.dFechaCancelacion,
+   [Motivo] = mi.sDescripcion,
+   [Tipo Alerta] = COALESCE(tt.sDescripcion, 'NO REGISTRA TIPO'),
+   [Observaciones1] = dnv.sObservaciones,
+   [Observaciones2] = dnv.[sObservaciones(SimDocInvalidacion)],
+   [Estado] = IIF(dnv.bActivo = 1, 'Inhabilitado', 'Habilitado'),
+   [Institucion] = i.sNombre
+
+FROM #dnv_informativas_inhabilitada dnv
+-- JOIN SimDocInvalidacion di ON dnv.nIdDocInvalidacion = di.nIdDocInvalidacion
+JOIN SimMotivoInvalidacion mi ON dnv.sIdMotivoInv = mi.sIdMotivoInv
+JOIN SimTablaTipo tt ON dnv.sIdAlertaInv = tt.strequivalente
+LEFT JOIN SimInstitucion i ON dnv.sIdInstitucion = i.sIdInstitucion
+WHERE
+   dnv.sObservaciones LIKE @obs OR dnv.[sObservaciones(SimDocInvalidacion)] LIKE @obs
+
+
+
+/* kquispet: Alertas por `RQ`
+*
+*  → RQ: Orden captura.
+*  → Emisión de alertas fueron antes de la calidad.
+*  → Si calidad fue declarada nula por la alerta.           */
+DECLARE @rq VARCHAR(55) = '%orden%captura%'
+DROP TABLE IF EXISTS #tmp_rq
+SELECT
+
+   [Num Doc Invalida] = CONCAT(di.sIdDocInvalida, ' N° ', di.sNumDocInvalida),
+   [Nombre] = dnv.sNombre,
+   [Paterno] = dnv.sPaterno,
+   [Materno] = dnv.sMaterno,
+   [Sexo] = dnv.sSexo,
+   [Documento] = dnv.sIdDocumento,
+   [Num Doc Identidad] = CONCAT('''', dnv.sNumDocIdentidad),
+   [Fecha Nacimiento] = dnv.dFechaNacimiento,
+   [Pais Nacionalidad] = dnv.sIdPaisNacionalidad,
+   [Fecha Inicio Medida] = dnv.dFechaInicioMedida,
+   [Fecha Emisión] = di.dFechaEmision,
+   [Fecha Recepción] = di.dFechaRecepcion,
+   [Fecha Cancelación DNV] = dnv.dFechaCancelacion,
+   [Motivo] = mi.sDescripcion,
+   [Tipo Alerta] = COALESCE(tt.sDescripcion, 'NO REGISTRA TIPO'),
+   [Observaciones1] = dnv.sObservaciones,
+   [Observaciones2] = di.sObservaciones,
+   [Estado] = IIF(dnv.bActivo = 1, 'Inhabilitado', 'Habilitado'),
+   [Institucion] = i.sNombre
+
+   INTO #tmp_rq
+FROM SimPersonaNoAutorizada dnv
+JOIN SimDocInvalidacion di ON dnv.nIdDocInvalidacion = di.nIdDocInvalidacion
+JOIN SimMotivoInvalidacion mi ON dnv.sIdMotivoInv = mi.sIdMotivoInv
+JOIN SimTablaTipo tt ON dnv.sIdAlertaInv = tt.strequivalente
+LEFT JOIN SimInstitucion i ON di.sIdInstitucion = i.sIdInstitucion
+WHERE
+   dnv.bActivo = 1-- Inhabilitada
+   AND (dnv.sObservaciones LIKE @rq OR di.sObservaciones LIKE @rq)
+
+-- Test ...
+SELECT TOP 10 * FROM #tmp_rq
+
+SELECT TOP 10 * FROM BD_SIRIM.dbo.RimUltimaCalidadExtranjero
+
+-- ==========================================================================================================================================
+

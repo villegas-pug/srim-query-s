@@ -11,13 +11,49 @@ GO
 [dbo].[SimPersonaCUE]
 [dbo].[SimSolicitudCUE]
 [dbo].[SimSolicitudObsCUE]
-[dbo].[SimSolUnifiPersCUE] */
+[dbo].[SimSolUnifiPersCUE] 
+
+*/
+
+SELECT
+   TOP 10
+   cu.*
+FROM SimCodigoUnicoExtranjero cu
+WHERE cu.bActivo = 1
 
 SELECT TOP 10 * FROM SimExtranjero
 SELECT TOP 10 * FROM SimPersona
 SELECT TOP 10 * FROM SimPersonaCUE
 SELECT TOP 10 * FROM SimDatosTramiteCUE
 SELECT TOP 10 * FROM SimSolicitudCUE
+SELECT TOP 10 * FROM SimCoincidenciasIdentidadesCUE
+SELECT TOP 10 * FROM SimSolUnifiPersCUE
+
+SELECT TOP 10 * FROM SimSolicitudCUE
+SELECT TOP 10 * FROM SimPersonaCUE
+SELECT TOP 10 * FROM SimDatosTramiteCUE
+SELECT TOP 10 * FROM SimCoincidenciasIdentidadesCUE
+
+SELECT 
+   u.nIdSolicitudCUE,
+   COUNT(1) 
+FROM SimSolUnifiPersCUE u
+WHERE
+   u.bActivo = 1
+GROUP BY
+   u.nIdSolicitudCUE
+ORDER BY 2 DESC
+
+
+SELECT 
+   COUNT(DISTINCT u.nIdSolicitudCUE)
+   -- COUNT(1)
+FROM SimSolUnifiPersCUE u
+WHERE
+   u.bActivo = 1
+
+
+-- Cuanto estan por evaluar y
 
 -- 1
 -- nProcesoConicidencia 
@@ -33,6 +69,7 @@ SELECT TOP 10 * FROM SimCodigoUnicoExtranjero scue
 -- 3. `usp` REPORTE DE SOLICITUDES Y COINCIDENCIAS ...
 SELECT * FROM SimEtapaCUE
 EXEC Usp_Sim_Inm_Listar_SolicitudCUEMatchFind '2024-01-01 00:00:00.000', '2024-01-30 23:59:59.999'
+
 -- Usp_Sim_Cue_ObtenerCoincidencias
 
 -- 1. ...

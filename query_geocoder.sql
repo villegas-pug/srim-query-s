@@ -30,6 +30,13 @@ INSERT INTO ResultadoConsultaGeocoder(uIdPersona, sDireccion, sEstado, dLatitud,
       AND (LEN(e.sDireccion) > 0 AND e.sDireccion IS NOT NULL)
 
 
+SELECT
+   COUNT(1)
+FROM BD_SIRIM.dbo.RimTotalExtranjerosPeru e 
+WHERE 
+   e.Distrito = 'SAN MARTIN DE PORRES'
+
+
 -- 2.1: Update → Concatener `Peru`  a sDireccion ...
 /* UPDATE ResultadoConsultaGeocoder
    SET sDireccion = CONCAT(sDireccion, ', Perú') */

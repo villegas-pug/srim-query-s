@@ -2,35 +2,239 @@
 GO
 
 /*░
--- 1. Base de datos de Control Migratorio del Sistema Integrado de Migraciones de ciudadanos peruanos que no tienen nacionalidad (NNN).
+-- 1. Base de datos de Control Migratorio del Sistema Integrado de Migraciones de ciudadanos peruanos que no registran nacionalidad (NNN).
 ==========================================================================================================================================================*/
+
+-- 1.1.1 `tmp`
+
 SELECT 
-	sper.sNombre,
-	sper.sPaterno,
-	sper.sMaterno,
-	sper.sSexo,
-	sper.dFechaNacimiento,
-	smm.sIdMovMigratorio,
-	smm.uIdPersona,
-	[sCalidad_CM] = scm.sDescripcion,
-	[sIdDocumento_CM] = smm.sIdDocumento,
-	[sNumeroDoc_CM] = CONCAT('''', smm.sNumeroDoc),
-	[sIdPaisNacionalidad_CM] = smm.sIdPaisNacionalidad,
-	[sIdPaisNacionalidad_P] = sper.sIdPaisNacionalidad
-FROM SimMovMigra smm 
-JOIN SimPersona sper ON smm.uIdPersona = sper.uIdPersona
-JOIN SimCalidadMigratoria scm ON smm.nIdCalidad = scm.nIdCalidad
+	pe.sNombre,
+	pe.sPaterno,
+	pe.sMaterno,
+	pe.sSexo,
+	pe.dFechaNacimiento,
+	mm.sIdMovMigratorio,
+	mm.uIdPersona,
+
+	-- Aux
+	[Documento(SimMovMigra)] = mm.sIdDocumento,
+	[Numero Doc(SimMovMigra)] = CONCAT('''', mm.sNumeroDoc),
+	[Pais Nacionalidad(SimMovMigra)] = mm.sIdPaisNacionalidad,
+	[Pais Nacionalidad(SimPersona)] = pe.sIdPaisNacionalidad,
+	
+	[Total Registros(SimMovMigra)] = COUNT(1) OVER (PARTITION BY mm.uIdPersona), -- >=2
+
+	[Nacionalidades(SimMovMigra)] = ( -- Nacionalidades registradas
+													SELECT 
+														[Nacionalidad] = mm2.sIdPaisNacionalidad,
+														[Total] = COUNT(1)
+													FROM SimMovMigra mm2
+													WHERE
+														mm2.bAnulado = 0
+														AND mm2.bTemporal = 0
+														AND mm2.uIdPersona = pe.uIdPersona
+													GROUP BY
+														mm2.sIdPaisNacionalidad
+													ORDER BY 2 DESC
+													FOR XML PATH('')
+											),
+	[Nacionalidad Recurrente(SimMovMigra)] = (
+																SELECT 
+																	TOP 1
+																	mm2.sIdPaisNacionalidad
+																FROM SimMovMigra mm2
+																WHERE
+																	mm2.bAnulado = 0
+																	AND mm2.bTemporal = 0
+																	AND mm2.uIdPersona = pe.uIdPersona
+																GROUP BY
+																	mm2.sIdPaisNacionalidad
+																ORDER BY COUNT(1) DESC
+													)
+
+
+FROM SimMovMigra mm
+JOIN SimPersona pe ON mm.uIdPersona = pe.uIdPersona
+JOIN SimCalidadMigratoria cm ON mm.nIdCalidad = cm.nIdCalidad
 WHERE
-	sper.bActivo = 1
-	AND sper.sIdPaisNacionalidad = 'PER'
-	AND smm.bAnulado = 0
-	AND smm.bTemporal = 0
-	AND smm.sIdDocumento IN ('DNI', 'PAS')
-	AND smm.nIdCalidad = 21 -- 21 | PERUANO                                  
-	AND (smm.sIdPaisNacionalidad IN ('NNN', '') OR smm.sIdPaisNacionalidad IS NULL)
-ORDER BY 
-	smm.dFechaControl DESC
---==========================================================================================================================================================*/
+	pe.bActivo = 1
+	AND mm.bAnulado = 0
+	AND mm.bTemporal = 0
+	AND pe.sIdPaisNacionalidad != 'NNN'
+	AND (mm.sIdPaisNacionalidad = 'NNN' AND pe.sIdPaisNacionalidad != 'NNN')
+	-- AND smm.sIdDocumento IN ('DNI', 'PAS')
+	-- AND smm.nIdCalidad = 21 -- 21 | PERUANO
+
+
+-- 1.2. Método-2
+
+-- 1.2.1: `tmp's`
+
+-- SimMovMigra ↔ SimPersona
+DROP TABLE IF EXISTS #tmp_pe_mm_nnn
+SELECT 
+	mm.sIdMovMigratorio,
+	mm.uIdPersona,
+	[sIdPaisNacionalidad(SimMovMigra)] = mm.sIdPaisNacionalidad,
+	[sIdPaisNacionalidad(SimPersona)] = pe.sIdPaisNacionalidad
+	INTO #tmp_pe_mm_nnn
+FROM SimMovMigra mm
+JOIN SimPersona pe ON mm.uIdPersona = pe.uIdPersona
+WHERE
+	pe.bActivo = 1
+	AND mm.bAnulado = 0
+	AND mm.bTemporal = 0
+	AND (mm.sIdPaisNacionalidad = 'NNN' AND pe.sIdPaisNacionalidad != 'NNN')
+
+
+DROP TABLE IF EXISTS #tmp_mm
+SELECT 
+	mm.sIdMovMigratorio,
+	mm.uIdPersona,
+	mm.sIdPaisNacionalidad
+	INTO #tmp_mm
+FROM SimMovMigra mm
+WHERE
+	mm.bAnulado = 0
+	AND mm.bTemporal = 0
+	AND mm.uIdPersona IN ( SELECT DISTINCT n.uIdPersona FROM #tmp_pe_mm_nnn n) 
+
+CREATE NONCLUSTERED INDEX ix_tmp_mm_uid 
+	ON #tmp_mm(uIdPersona)
+
+-- 1.2.2: ...
+BEGIN
+
+	-- repositorio:
+	DROP TABLE IF EXISTS #tmp_mm_nnn_final
+	SELECT 
+		TOP 0
+		mm.uIdPersona,
+		mm.sIdMovMigratorio,
+		[sNacionalidades(SimMovMigra)] = REPLICATE('', 5000),
+		[sIdPaisNacionalidad(SimPersona)] = REPLICATE('', 3),
+		[sEstado] = REPLICATE('', 55)
+		INTO #tmp_mm_nnn_final
+	FROM SimMovMigra mm
+
+	-- Copia: `#tmp_pe_mm_nnn`
+	DROP TABLE IF EXISTS #tmp_pe_mm_nnn_bak
+	SELECT * INTO #tmp_pe_mm_nnn_bak FROM #tmp_pe_mm_nnn
+
+
+	-- » Evaluación de casos atipicos ...
+	WHILE (EXISTS(SELECT TOP 1 1 FROM #tmp_pe_mm_nnn_bak))
+	BEGIN
+
+		-- Dep's
+		DECLARE @uIdNNN UNIQUEIDENTIFIER
+		DECLARE @sIdMovMigraNNN CHAR(14)
+		DECLARE @sIdPaisNacPer CHAR(3)
+
+		-- Único registro inconsistente para evaludar ...
+		SELECT 
+			TOP 1
+			@uIdNNN = r.uIdPersona,
+			@sIdMovMigraNNN = r.sIdMovMigratorio,
+			@sIdPaisNacPer = r.[sIdPaisNacionalidad(SimPersona)]
+		FROM #tmp_pe_mm_nnn_bak r
+		ORDER BY r.sIdMovMigratorio ASC
+
+		-- Nacionalidades concurrentes en Movimiento Migratorios ...
+		DECLARE @tblNacConcurrMM TABLE (sIdPaisNacionalidad CHAR(3), nTotal INT) -- tmp
+		DECLARE @nacsConcurrMM VARCHAR(MAX) = ''
+		DECLARE @nacConcurrMM CHAR(3)
+		DECLARE @totalMovMigra INT = (SELECT COUNT(1) FROM #tmp_mm mm WHERE mm.uIdPersona = @uIdNNN)
+		DECLARE @totalNacConcurrMM INT
+
+		-- Si registra 1 movimiento migratorio, pasa a siguiente iteración ...
+		IF (@totalMovMigra = 1) GOTO clean_up
+
+		-- Nacionalidades concurrentes en MovMigra ...
+		INSERT INTO @tblNacConcurrMM
+			SELECT 
+				mm.sIdPaisNacionalidad,
+				[nTotal] = COUNT(1)
+			FROM #tmp_mm mm
+			WHERE mm.uIdPersona = @uIdNNN
+			GROUP BY mm.sIdPaisNacionalidad
+
+		SELECT 
+			@nacsConcurrMM += CONCAT(c.sIdPaisNacionalidad, ': ', c.nTotal, ', ', CHAR(10))
+		FROM @tblNacConcurrMM c
+		ORDER BY c.nTotal DESC
+
+		SET @nacConcurrMM = (SELECT TOP 1 c.sIdPaisNacionalidad FROM @tblNacConcurrMM c ORDER BY c.nTotal DESC)
+		SET @totalNacConcurrMM = (SELECT COUNT(1) FROM @tblNacConcurrMM)
+
+		-- CA-01: Si registra 2 movimientos migratorios. → E: `Para analizar`
+		IF (@totalMovMigra = 2) GOTO TO_ANALISIS
+
+		-- CA-02: Nacionalidad más registrada en `SimMovMigra` es `NNN`. → E: `Para análisis`
+		IF (@nacConcurrMM = 'NNN') GOTO TO_ANALISIS
+
+		-- CA-03: Nacionalidades concurrentes en `SimMovMigra` es mayor o igual a 3. → E: `Para análisis`
+		IF (@totalNacConcurrMM >= 3) GOTO TO_ANALISIS
+
+		-- CA-03: Nacionalidad más registrada en `SimMovMigra` es diferente a nacionalidad de `SimPersona`. → E: `Para análisis`
+		IF (@nacConcurrMM != @sIdPaisNacPer) GOTO TO_ANALISIS
+
+		-- CA-04: Nacionalidad más registrada en `SimMovMigra` es igual a nacionalidad de `SimPersona`. → E: `Para levantamiento`
+		IF (@nacConcurrMM = @sIdPaisNacPer)
+			BEGIN
+				INSERT INTO #tmp_mm_nnn_final
+					VALUES(
+						@uIdNNN,
+						@sIdMovMigraNNN,
+						@nacsConcurrMM,
+						@sIdPaisNacPer,
+						'Para levantamiento'
+					)
+
+				GOTO CLEAN_UP
+			END
+
+		-- Si, no ocurre ninguno de los casos atípicos:
+		GOTO CLEAN_UP
+
+
+		TO_ANALISIS:
+			INSERT INTO #tmp_mm_nnn_final
+					VALUES(
+						@uIdNNN,
+						@sIdMovMigraNNN,
+						@nacsConcurrMM,
+						@sIdPaisNacPer,
+						'Para análisis'
+					)
+
+		CLEAN_UP:
+			DELETE FROM @tblNacConcurrMM
+			DELETE FROM #tmp_pe_mm_nnn_bak WHERE sIdMovMigratorio = @sIdMovMigraNNN
+
+	END
+
+END
+
+
+-- Test
+SELECT COUNT(f.sIdMovMigratorio) FROM #tmp_mm_nnn_final f -- 12,074
+SELECT COUNT(DISTINCT f.sIdMovMigratorio) FROM #tmp_mm_nnn_final f -- 12,074
+
+SELECT * FROM #tmp_mm_nnn_final f
+WHERE f.sEstado = 'Para análisis'
+
+-- WHERE f.uIdPersona = '8f735dac-7c7d-46ed-bf6c-a6daecfd5501'
+
+SELECT COUNT(1) FROM SimMovMigra f
+WHERE 
+	f.bAnulado = 0
+	AND f.bTemporal = 0
+	AND f.uIdPersona = '8f735dac-7c7d-46ed-bf6c-a6daecfd5501'
+
+
+
+-- =========================================================================================================================================================
 
 /*░
 -- 2. Base de datos Control Migratorio del sitema integrado de migraciones de peruanos que contiene una letra en su número de DNI.

@@ -55,7 +55,15 @@ SELECT TOP 10 * FROM Names -- FK_Names_PNR
 SELECT TOP 10 * FROM Phone -- FK_TravelerPhone
 
 -- Aerolinea
-SELECT TOP 10 * FROM CarrierCode
+SELECT TOP 10 * FROM CarrierCode c
+SELECT * FROM CarrierCode c
+-- WHERE
+   -- c.Active = 1
+   -- AND c.Name = 'BLUE AIR'
+   -- c.Name = '%L%'
+ORDER BY c.Name
+
+EXEC sp_help CarrierCode
 
 -- Historial de Viajes
 EXEC sp_help TravelHistory

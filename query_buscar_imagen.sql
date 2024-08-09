@@ -47,11 +47,11 @@ LEFT JOIN SimDocPersona dp ON p.uIdPersona = dp.uIdPersona
 LEFT JOIN SimImagenExtranjero ie ON p.uIdPersona = ie.uIdPersona
 LEFT JOIN SimDedo de ON ie.sIdDedo = de.sIdDedo
 WHERE
-   p.sNombre LIKE '%OSWALDO%'
+   /* p.sNombre LIKE '%OSWALDO%'
    AND p.sPaterno LIKE 'CHÁVEZ'
-   AND p.sMaterno LIKE ''
-   /* dp.sIdDocumento = 'PAS'
-   AND dp.sNumero LIKE '087363922' */
+   AND p.sMaterno LIKE '' */
+   dp.sIdDocumento = 'CEE'
+   AND dp.sNumero LIKE '000316311'
    /* dp.sNumero IN (
       '43164873',
       '45248800',
@@ -60,6 +60,7 @@ WHERE
       '47370678',
       '71234099'
    ) */
+   AND ie.bUltimo = 1
 ORDER BY
    ie.bUltimo DESC,
    de.sNombre, ie.sTipo ASC,

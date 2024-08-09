@@ -6,6 +6,7 @@ GO
 
 -- 1.1
 SELECT
+
    [Id Persona] = p.uIdPersona,
    [Nombres] = p.sNombre,
    [Apellido 1] = p.sPaterno,

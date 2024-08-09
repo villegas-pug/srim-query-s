@@ -439,10 +439,61 @@ FROM (
 WHERE mm2.nOrden = 1
 
 
+-- Extranjero menores de edad
+/*
+   1. Extranjeros por nacionalida irregular e regular menores por grupo etario.
+   2. Extranjeros por nacionalida regular menores por calidad.
+*/
 
-
--- 2
-SELECT TOP 1 e.Nacionalidad 
-FROM BD_SIRIM.dbo.RimTotalExtranjerosPeru e
+SELECT
+   TOP 10
+   r.uIdPersona,
+   -- [Año Ingreso] = DATEPART(YYYY, r.dFechaIngreso), */
+	[sNacionalidad] = r.Nacionalidad,
+   [Grupo Etario] = r.RangoEdad,
+   [Genero] = r.Sexo,
+   [Calidad Migratoria] = r.CalidadMigratoria,
+	-- [Tipo Calidad] = r.CalidadTipo,
+	/* [sTipoCalidad] = CASE 
+								WHEN r.CalidadMigratoria = 'Permanente' OR r.CalidadMigratoria = 'Inmigrante' THEN 'Permanente'
+								WHEN r.CalidadTipo = 'R' AND (r.CalidadMigratoria != 'Permanente' AND r.CalidadMigratoria != 'Inmigrante') THEN 'Residente'
+								WHEN r.CalidadMigratoria = 'Turista' THEN 'Turista'
+								ELSE 'Otras calidades temporales'
+							END, */
+	[Situación Migratoria] = r.EstadoR3
+   
+FROM SIM.dbo.xTotalExtranjerosPeru r
 WHERE
-   e.Nacionalidad LIKE 'venez%'
+   r.Edad < 18 -- Menores
+   --AND r.dFechaIngreso >= '2016-01-01 00:00:00.000'
+   AND r.CalidadMigratoria = 'PERUANO'
+   -- e.EstadoR3 = 'Regulares'
+   -- e.Nacionalidad = 'Venezolana'
+
+-- SELECT TOP 10 * FROM SIM.dbo.xTotalExtranjerosPeru e
+
+
+/* 
+   2e4802c9-4376-4558-a5a6-5b386e7707c9
+   278f3aad-2dff-40e3-b7b6-43b0cd98fee7
+   9b55c5e1-7147-4c82-a19a-d265c8c21787
+   9ee867fc-288a-4aaa-9258-61585961f838
+ */
+SELECT cm.sDescripcion, p.* 
+FROM SimPersona p
+JOIN SimCalidadMigratoria cm ON p.nIdCalidad = cm.nIdCalidad
+WHERE 
+   p.uIdPersona = '9ee867fc-288a-4aaa-9258-61585961f838'
+
+SELECT * FROM RimRNProceso
+SELECT * FROM RimReglaNegocio
+SELECT * FROM RimRNControlCambios
+SELECT * FROM RimRNRegistroEjecucionScript
+
+UPDATE RimRNControlCambios
+   SET bActivo = 1
+WHERE nIdRNControlCambio = 2
+
+DELETE FROM RimRNRegistroEjecucionScript
+   WHERE nIdRegistroEjecucion >= 20
+

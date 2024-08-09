@@ -164,3 +164,16 @@ WHERE
 	)
 
 -- ===================================================================================================================================================
+
+USE SIM
+GO
+
+SELECT 
+	mm.*,
+	[nIdCalidad] = cm.nIdCalidad,
+	[sCalidad] = cm.sDescripcion
+FROM SimMovMigra mm
+JOIN SimCalidadMigratoria cm ON mm.nIdCalidad = cm.nIdCalidad
+WHERE
+	mm.bAnulado = 0
+	AND mm.bTemporal = 0

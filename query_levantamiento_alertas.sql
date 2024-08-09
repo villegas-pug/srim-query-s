@@ -1,7 +1,6 @@
 USE SIM
 GO
 
-
 /*
    bActivo
    0 → Habilitada
@@ -33,7 +32,7 @@ BEGIN TRAN
 -- COMMIT TRAN
 ROLLBACK TRAN
 
--- 3
+-- 3.
 -- 3.1: Final: Inserta dependencia y estado de alertas ...
 DROP TABLE IF EXISTS #tmp_dnv_informativas_analizadas_final
 SELECT 
@@ -92,15 +91,18 @@ SELECT
    INTO #tmp_dnv_informativas_analizadas_final
 FROM BD_SIRIM.dbo.tmp_dnv_informativas_analizadas a
 
--- Test
-SELECT * FROM #tmp_dnv_informativas_analizadas_final f WHERE f.sDependencia IS NULL
+-- 3.2: Final: Alertas pendientes analizadas para levantamiento ...
+SELECT dnv.*
+FROM #tmp_dnv_informativas_analizadas_final dnv
+WHERE
+   dnv.sEstado = 'Inhabilitado'
 
--- 3.1.1 Pivot final
+-- 3.3 Pivot final
 SELECT pv.* 
 FROM (
    SELECT 
       [sNombreBase] = f.sNombrebasee,
-      f.sDependencia,
+      -- f.sDependencia,
       f.sEstado,
       f.nId
    FROM #tmp_dnv_informativas_analizadas_final f
@@ -109,7 +111,7 @@ PIVOT (
    COUNT(f2.nId) FOR f2.sEstado IN ([Inhabilitado], [Habilitado])
 ) pv
 
--- 3.2: Final: Verifica alertas pendientes ...
+-- 3.4: Final: Verifica alertas pendientes por analizar ...
 DROP TABLE IF EXISTS #tmp_dnv_informativas_pendientes_final
 SELECT 
    [nIdDNV] = dnv.nIdCorrela,
@@ -286,4 +288,4 @@ WHERE
 GROUP BY
    dnv.bActivo
 
---========================================================================================================================================== */
+-- ========================================================================================================================================== */

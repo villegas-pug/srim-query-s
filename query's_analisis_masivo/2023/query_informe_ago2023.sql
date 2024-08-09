@@ -304,25 +304,19 @@ SELECT * FROM #tmp_pase_nomigrados_simpas pase
 	→ 4. Pasaportes electrónicos vencidos con estado `E | Emitido` en SimPasaporte ...
 ================================================================================================================================*/
 
--- Base: 3,954,465
-SELECT COUNT(1) FROM BD_SIRIM.dbo.RimPasaporte pase
-WHERE
-	pase.sEstado = 'ENTREGADA'
-	AND pase.sNumeroPasaporte IS NOT NULL
-
--- 1
+-- 4.1
 DROP TABLE IF EXISTS #tmp_pase_migradosvencidos_estado_E
 SELECT 
 	spas.*
-INTO #tmp_pase_migradosvencidos_estado_E FROM BD_SIRIM.dbo.RimPasaporte pase
+INTO #tmp_pase_migradosvencidos_estado_E
+FROM BD_SIRIM.dbo.RimPasaporte pase
 JOIN SimTramite st ON pase.sNumeroTramite = st.sNumeroTramite
 JOIN SimPasaporte spas ON st.sNumeroTramite = spas.sNumeroTramite
 WHERE
 	spas.sEstadoActual = 'E' -- Emitido
-	-- spas.sEstadoActual = 'A' -- Emitido
 	AND DATEDIFF(DD, GETDATE(), pase.dFechaCaducidad) <= 0
 
--- Final: ...
+-- 4.2 Final: ...
 SELECT 
 	spas.sNombre,
 	spas.sPaterno,
@@ -337,21 +331,6 @@ SELECT
 	INTO tmp_pase_migradosvencidos_estado_E
 FROM #tmp_pase_migradosvencidos_estado_E spas
 
--- Test ...
--- 688,832
-SELECT COUNT(1) FROM #tmp_pase_migradosvencidos_estado_E
-
-SELECT 
-	[nAño] = DATEPART(YYYY, pas.dFechaExpiracion),
-	[nTotal] = COUNT(1)
-	-- pas.*
-FROM #tmp_pase_migradosvencidos_estado_E pas
-WHERE
-	DATEPART(YYYY, pas.dFechaEmision) = 2020
-GROUP BY DATEPART(YYYY, pas.dFechaExpiracion)
-ORDER BY [nAño]
-	
-
 --================================================================================================================================*/
 
 /*░
@@ -359,7 +338,7 @@ ORDER BY [nAño]
 ================================================================================================================================*/
 
 -- Base: 3,954,465
--- 2	EXPEDICION DE PASAPORTE
+-- 5.1	EXPEDICION DE PASAPORTE
 DROP TABLE IF EXISTS #tmp_pasm_migradosvencidos_estado_E
 SELECT 
 	spas.*
@@ -367,11 +346,13 @@ SELECT
 FROM SimPasaporte spas 
 JOIN SimTramite st ON spas.sNumeroTramite = st.sNumeroTramite
 WHERE
-	st.nIdTipoTramite = 2 -- 2 | EXPEDICION DE PASAPORTE
+	st.bCancelado = 0
+	AND st.bCulminado = 1
+	AND st.nIdTipoTramite = 2 -- 2 | EXPEDICION DE PASAPORTE
 	AND spas.sEstadoActual = 'E' -- Emitido
 	AND DATEDIFF(DD, GETDATE(), spas.dFechaExpiracion) <= 0
 
--- Final: ...
+-- 5.2 Final: ...
 DROP TABLE IF EXISTS tmp_pasm_migradosvencidos_estado_E
 SELECT 
 	spas.sNombre,
@@ -389,19 +370,5 @@ FROM #tmp_pasm_migradosvencidos_estado_E spas
 ORDER BY spas.sNumeroTramite
 OFFSET 1000002 ROWS
 FETCH NEXT 500000 ROWS ONLY
-
--- Test ...
--- 688,832
--- 1,430,515
--- SELECT TOP 100 * FROM #tmp_pasm_migradosvencidos_estado_E
-SELECT 
-	[nAño] = DATEPART(YYYY, pas.dFechaExpiracion),
-	[nTotal] = COUNT(1)
-	-- pas.*
-FROM #tmp_pasm_migradosvencidos_estado_E pas
-/*WHERE
-	DATEPART(YYYY, pas.dFechaEmision) = 2021*/
-GROUP BY DATEPART(YYYY, pas.dFechaExpiracion)
-ORDER BY [nAño]
 
 --================================================================================================================================*/

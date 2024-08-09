@@ -113,7 +113,7 @@ WHERE
 	AND sti.sEstadoActual = 'P'
 	AND (sce.dFechaCaducidad IS NOT NULL AND sce.dFechaCaducidad != '')
 
-*/
+
 --===========================================================================================================================================================*/
 
 /*░
@@ -215,7 +215,7 @@ ORDER BY 3 DESC
 
 
 /*░
-	4. Nacidos peruano y con nacionalidad peruana con calidad diferente de Peruano ...
+	4. Ciudadanos con nacionalidad `PERUANA` y calidad diferente a `PERUANO` ...
 ===========================================================================================================================================================*/
 
 SELECT 
@@ -239,7 +239,8 @@ WHERE
 	AND sper.uIdPersona != '00000000-0000-0000-0000-000000000000'
 	-- AND (sper.sIdPaisNacionalidad = 'PER' AND sper.sIdPaisNacimiento = 'PER')
 	AND sper.sIdPaisNacionalidad = 'PER'
-	AND (sper.sIdDocIdentidad = 'DNI' AND LEN(sper.sNumDocIdentidad) = 8)
+	AND sper.sIdDocIdentidad = 'DNI'
+	AND (LEN(sper.sNumDocIdentidad) = 8 AND ISNUMERIC(sper.sNumDocIdentidad) = 1)
 	AND sper.nIdCalidad != 21 -- 21 | PERUANO
 
 

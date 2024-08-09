@@ -58,19 +58,20 @@ SELECT
 								AND setai.bActivo = 1
 								AND setai.sEstado = 'I'
 						   ORDER BY setai.dFechaHoraInicio DESC),
-	[sEstado_Eval] = (SELECT 
-						TOP 1 
-						CASE setai.sEstado 
-							WHEN 'F' THEN 'FINALIZADO'
-							WHEN 'I' THEN 'INICIADO'
-						END
-						FROM SimEtapaTramiteInm setai 
-						WHERE 
-							setai.sNumeroTramite = st.sNumeroTramite 
-							AND setai.nIdEtapa = 46 -- Evaluación
-							AND setai.bActivo = 1
-							AND setai.sEstado = 'I'
-						ORDER BY setai.dFechaHoraInicio DESC)
+	[sEstado_Eval] = (
+								SELECT TOP 1
+								CASE setai.sEstado 
+									WHEN 'F' THEN 'FINALIZADO'
+									WHEN 'I' THEN 'INICIADO'
+								END
+								FROM SimEtapaTramiteInm setai 
+								WHERE 
+									setai.sNumeroTramite = st.sNumeroTramite 
+									AND setai.nIdEtapa = 46 -- Evaluación
+									AND setai.bActivo = 1
+									AND setai.sEstado = 'I'
+								ORDER BY setai.dFechaHoraInicio DESC
+							)
 FROM SimTramite st
 JOIN SimTramiteInm sti ON st.sNumeroTramite = sti.sNumeroTramite
 JOIN SimPersona sp ON st.uIdPersona = sp.uIdPersona

@@ -7,6 +7,8 @@ DROP TABLE IF EXISTS #tmp_ce
 SELECT
    t.uIdPersona,
    ce.dFechaEmision,
+   ce.dFechaCaducidad,
+   ce.dFechaVencRes,
    t.sNumeroTramite,
    [sTramite] = 'CE/CCM',
    [sEstadoCE] = (
@@ -53,6 +55,8 @@ DROP TABLE IF EXISTS #tmp_ptp
 SELECT
    t.uIdPersona,
    ce.dFechaEmision,
+   ce.dFechaCaducidad,
+   [dFechaVencRes] = '',
    t.sNumeroTramite,
    [sTramite] = 'CPP/PTP',
    [sEstadoCE] = (
@@ -94,10 +98,13 @@ WHERE
                                           --      113 ↔ REGULARIZACION DE EXTRANJEROS; 
                                           --      126 ↔ PERMISO TEMPORAL DE PERMANENCIA - RS109
 
--- 3: Final ...
+-- 3: Final: `tmp` ...
+DROP TABLE IF EXISTS BD_SIRIM.dbo.RimUltimoCarnetExtranjeriaPersona
 SELECT 
    e2.*,
    ex.sDomicilio
+
+   INTO BD_SIRIM.dbo.RimUltimoCarnetExtranjeriaPersona
 FROM (
    SELECT 
       e.*,

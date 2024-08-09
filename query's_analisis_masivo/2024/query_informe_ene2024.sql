@@ -9,8 +9,6 @@ GO
    T → Temporal
    N → (PTP, CPP, CPP-RS109) */
 
-SELECT TOP 10 * FROM SIM.dbo.xTotalExtranjerosPeru
-
 -- 1. Residentes con el tipo de Calidad `T` → Temporal ...
 -- 458,236
 SELECT 
@@ -232,6 +230,7 @@ SELECT p.* INTO #tmp_simperuano FROM (
       sper.bActivo = 1
       AND sper.uIdPersona != '00000000-0000-0000-0000-000000000000'
       AND sper.sIdPaisNacimiento = 'PER'
+      AND sper.sIdPaisNacionalidad = 'PER'
       AND sper.sIdDocIdentidad IN ('DNI', 'PAS', 'LE', 'PNA', 'SLV', 'LIB')
       -- AND (LEN(sper.sNumDocIdentidad) > 0 AND sper.sNumDocIdentidad IS NOT NULL)
 
