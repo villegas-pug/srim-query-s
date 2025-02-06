@@ -1,0 +1,55 @@
+<mxfile host="65bd71144e">
+    <diagram id="_paF_yRYUff6A6t7gDFu" name="Page-1">
+        <mxGraphModel dx="1311" dy="787" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="13" value="List" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;fontFamily=Tahoma;strokeWidth=1;perimeterSpacing=1;rounded=1;glass=0;shadow=1;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="120" width="140" height="60" as="geometry">
+                        <mxRectangle x="80" y="250" width="60" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="14" value="nId" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontFamily=Comic Sans MS;fontSize=11;absoluteArcSize=0;" vertex="1" parent="13">
+                    <mxGeometry y="30" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="List" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;fontFamily=Tahoma;strokeWidth=1;perimeterSpacing=1;rounded=1;glass=0;shadow=1;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="210" width="140" height="60" as="geometry">
+                        <mxRectangle x="80" y="250" width="60" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="34" value="nId" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontFamily=Comic Sans MS;fontSize=11;absoluteArcSize=0;" vertex="1" parent="33">
+                    <mxGeometry y="30" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="List" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;fontFamily=Tahoma;strokeWidth=1;perimeterSpacing=1;rounded=1;glass=0;shadow=1;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="300" width="140" height="60" as="geometry">
+                        <mxRectangle x="80" y="250" width="60" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="nId" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontFamily=Comic Sans MS;fontSize=11;absoluteArcSize=0;" vertex="1" parent="35">
+                    <mxGeometry y="30" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="" style="ellipse;whiteSpace=wrap;html=1;rounded=1;shadow=1;glass=0;sketch=0;strokeWidth=1;fontFamily=Comic Sans MS;fontSize=11;fontColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="380" width="260" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=4;hachureGap=8;hachureAngle=45;fillColor=#1ba1e2;sketch=1;shadow=1;glass=0;fontFamily=Comic Sans MS;fontSize=11;fontColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="220" width="440" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=2;hachureGap=8;fillColor=#990000;fillStyle=dots;sketch=1;rounded=1;shadow=1;glass=0;fontFamily=Comic Sans MS;fontSize=11;fontColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="60" width="270" height="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="Process Bar" style="swimlane;childLayout=stackLayout;horizontal=1;fillColor=none;horizontalStack=1;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;strokeColor=none;stackBorder=10;stackSpacing=-12;resizable=1;align=center;points=[];whiteSpace=wrap;html=1;rounded=1;shadow=1;glass=0;sketch=0;strokeWidth=1;fontFamily=Comic Sans MS;fontSize=11;fontColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="640" width="296" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="Step 1" style="shape=step;perimeter=stepPerimeter;fixedSize=1;points=[];whiteSpace=wrap;html=1;rounded=1;shadow=1;glass=0;sketch=0;strokeWidth=1;fontFamily=Comic Sans MS;fontSize=11;fontColor=default;" vertex="1" parent="40">
+                    <mxGeometry x="10" y="33" width="100" height="57" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="Step 2" style="shape=step;perimeter=stepPerimeter;fixedSize=1;points=[];whiteSpace=wrap;html=1;rounded=1;shadow=1;glass=0;sketch=0;strokeWidth=1;fontFamily=Comic Sans MS;fontSize=11;fontColor=default;" vertex="1" parent="40">
+                    <mxGeometry x="98" y="33" width="100" height="57" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="Step 3" style="shape=step;perimeter=stepPerimeter;fixedSize=1;points=[];whiteSpace=wrap;html=1;rounded=1;shadow=1;glass=0;sketch=0;strokeWidth=1;fontFamily=Comic Sans MS;fontSize=11;fontColor=default;" vertex="1" parent="40">
+                    <mxGeometry x="186" y="33" width="100" height="57" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
