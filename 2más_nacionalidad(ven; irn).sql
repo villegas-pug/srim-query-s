@@ -26,7 +26,7 @@ FROM SimPersona pe
 WHERE
    pe.bActivo = 1
 
-CREATE NONCLUSTERED INDEX #tmp_persona_ids 
+CREATE NONCLUSTERED INDEX #tmp_persona_ids
    ON #tmp_persona(sIdPersona, uIdPersona)
 
 -- 2. Filtro:  ...
