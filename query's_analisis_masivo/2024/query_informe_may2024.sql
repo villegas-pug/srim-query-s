@@ -83,7 +83,7 @@ WHERE
 
 -- ======================================================================================================================================================================== */
 
--- 2. Trámites de CCM, CPP y PTP con estato de trámite `PENDIENTE` en etapa que actualiza el estado a `APROBADO` con estado `FINALIZADO` ...
+-- 2. Trámites de CCM, CPP y PTP con estado de trámite `PENDIENTE` en etapa que actualiza el estado ha `APROBADO` con estado `FINALIZADO`.
 -- ======================================================================================================================================================================== */
 
 -- 2.1
@@ -680,7 +680,7 @@ WHERE
 -- ======================================================================================================================================================================== */
 
 
--- 7. Etapa actual de trámites de inmigración en SIM.dbo.SimTramiteInm, diferente a ultima etapa registrada en SIM.dbo.SimEtapaTramiteInm ...
+-- 7. La última etapa registrada en el registro de etapas es diferente de la etapa actual asociada al trámite.
 -- ======================================================================================================================================================================== */
 
 -- 7.1
@@ -1054,7 +1054,7 @@ WHERE f.[sDupl(Hora)] != ''
 -- 10.1
 SELECT
 
-   /* [Id Persona] = p.uIdPersona,
+   [Id Persona] = p.uIdPersona,
    [Nombres] = p.sNombre,
    [Apellido 1] = p.sPaterno,
    [Apellido 2] = p.sMaterno,
@@ -1070,9 +1070,7 @@ SELECT
    [Fecha Nacimiento] = p.dFechaNacimiento,
    [Fecha Control] = mm.dFechaControl,
    [Edad (Control Migratorio)] = DATEDIFF(YYYY, p.dFechaNacimiento, mm.dFechaControl),
-   [Pais Nacionalidad] = mm.sIdPaisNacionalidad */
-   -- mm.sIdMovMigratorio
-   COUNT(1)
+   [Pais Nacionalidad] = mm.sIdPaisNacionalidad
 
 FROM SIM.dbo.SimMovMigra mm
 JOIN SIM.dbo.SimPersona p ON mm.uIdPersona = p.uIdPersona

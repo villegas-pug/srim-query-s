@@ -1,6 +1,5 @@
 ﻿/*░
--- 
-	→ Nombres| Apellido 1 | Apellido 2 | Sexo | Fecha de Nacimiento	| Nacionalidad 
+-- → Nombres| Apellido 1 | Apellido 2 | Sexo | Fecha de Nacimiento	| Nacionalidad 
 ===============================================================================================================*/
 
 -- STEP-01: `tmp`

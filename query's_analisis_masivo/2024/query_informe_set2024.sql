@@ -4,7 +4,7 @@
 -- 1.1 
 SELECT 
 
-   /* [Id Persona] = pe.uIdPersona,
+   [Id Persona] = pe.uIdPersona,
    [Nombres] = pe.sNombre,
    [Apellido 1] = pe.sPaterno,
    [Apellido 2] = pe.sMaterno,
@@ -17,8 +17,7 @@ SELECT
    [Fecha Control] = mm.dFechaControl,
    [Tipo Movimiento] = mm.sTipo,
    [Via Transporte] = t.sDescripcion,
-   [Dependencia] = d.sNombre */
-   COUNT(1)
+   [Dependencia] = d.sNombre
 
 FROM SIM.dbo.SimMovMigra mm
 JOIN SIM.dbo.SimPersona pe ON mm.uIdPersona = pe.uIdPersona
@@ -176,8 +175,6 @@ WHERE
 -- =====================================================================================================================================================================
 
 
--- 5. Se define como regla que, los datos de la persona asociados al trámite en la base central de pasaportes deben ser iguales a los datos de la persona asociados 
---    al trámite en el Sistema Integral de Migraciones (SIM).
 -- 5. Se define como regla de calidad que, los datos de la persona asociados al trámite en la base central de pasaportes deben ser iguales a los datos de la persona asociados al trámite en el Sistema Integral de Migraciones.
 -- =====================================================================================================================================================================
 

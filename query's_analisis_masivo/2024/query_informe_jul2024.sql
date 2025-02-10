@@ -6,7 +6,7 @@ GO
 
 SELECT
 
-   /* [Id Persona] = pe.uIdPersona,
+   [Id Persona] = pe.uIdPersona,
    [Nombres] = pe.sNombre,
    [Apellido 1] = pe.sPaterno,
    [Apellido 2] = pe.sMaterno,
@@ -21,9 +21,7 @@ SELECT
    [Documento] = mm.sIdDocumento,
    [Número Documento] = mm.sNumeroDoc,
    [Dependencia] = d.sNombre,
-   [Módulo] = mm.sIdModuloDigita */
-   -- mm.sIdMovMigratorio
-   COUNT(1)
+   [Módulo] = mm.sIdModuloDigita
 
 FROM SIM.dbo.SimMovMigra mm
 JOIN SIM.dbo.SimPersona pe ON mm.uIdPersona = pe.uIdPersona

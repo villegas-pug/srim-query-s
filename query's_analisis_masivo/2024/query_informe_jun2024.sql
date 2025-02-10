@@ -6,7 +6,7 @@ GO
 
 -- 1.1 `tmp` Registros de control migratorio de A.I.J.C.H
 SELECT
-   /* TOP 1
+
    mm.sIdMovMigratorio,
    mm.uIdPersona,
    mm.sTipo,
@@ -15,9 +15,7 @@ SELECT
    [dFechaProgramada(SimItinerario)] = CAST(i.dFechaProgramada AS DATE),
    [sNumeroNave(SimItinerario)] = i.sNumeroNave,
    [nIdTransportista(SimItinerario)] = i.nIdTransportista,
-   [sTipo(SimItinerario)] = i.sTipoMovimiento */
-
-   COUNT(1)
+   [sTipo(SimItinerario)] = i.sTipoMovimiento
 
 FROM SimMovMigra mm
 JOIN SimItinerario i ON mm.sIdItinerario = i.sIdItinerario
@@ -33,13 +31,13 @@ WHERE
 -- ========================================================================================================================================================================
 
 
---> ░ 2. Pais de procedencia o destino en `SIM.dbo.SimMovMigra`, distinto a Pais de procedencia o destino en `SIM.dbo.SimItinerario`.
+--> ░ 2. Se define como regla, que el país de procedencia o destino registrado en el Control Migratorio debe coincidir con el país de procedencia o destino registrado en el Itinerario.
 -- ========================================================================================================================================================================
 
 -- 2.1
 SELECT
 
-   /* [Id Persona] = pe.uIdPersona,
+   [Id Persona] = pe.uIdPersona,
    [Nombres] = pe.sNombre,
    [Apellido 1] = pe.sPaterno,
    [Apellido 2] = pe.sMaterno,
@@ -54,8 +52,7 @@ SELECT
    [Itinerario(SimMovMigra)] = mm.sIdItinerario,
    [Pais Movimiento(SimMovMigra)] = mm.sIdPaisMov,
    [Itinerario(SimItinerario)] = i.sIdItinerario,
-   [Pais Movimiento(SimItinerario)] = i.sIdPais */
-   COUNT(1)
+   [Pais Movimiento(SimItinerario)] = i.sIdPais
    
 FROM SimMovMigra mm
 JOIN SimPersona pe ON mm.uIdPersona = pe.uIdPersona
@@ -222,6 +219,7 @@ WHERE
 -- ========================================================================================================================================================================
 
 
+--> ░ 4. Se define como regla, que la emisión de carnet de extranjeria es para cada persona individualmente.
 --> ░ 4. Distintos ciudadanos extranjeros, registran igual número de C.E en `SIM.dbo.SimCarnetExtranjeria`.
 -- ========================================================================================================================================================================
 
@@ -292,7 +290,6 @@ ORDER BY f1.sNumeroCarnet
 -- ========================================================================================================================================================================
 
 
---> ░ 5. Ciudadanos de nacionalidad `PERUANA` con más de 1 pasaporte, no registran trámite de `ANULACIÓN DE PASAPORTE` en relación al pasaporte anterior.
 -- 5. Se define como regla, que los ciudadanos de nacionalidad peruana que posean más de un pasaporte, deben registrar un trámite de anulación de pasaporte correspondiente al pasaporte anterior.
 -- ========================================================================================================================================================================
 

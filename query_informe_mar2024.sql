@@ -188,7 +188,7 @@ JOIN SimCalidadMigratoria cm ON p.nIdCalidad = cm.nIdCalidad
 
 SELECT
 
-   /* [Id Persona] = p.uIdPersona,
+   [Id Persona] = p.uIdPersona,
    [Nombres] = p.sNombre,
    [Apellido 1] = p.sPaterno,
    [Apellido 2] = p.sMaterno,
@@ -202,9 +202,7 @@ SELECT
    [Tipo Movimiento] = mm.sTipo,
    [Calidad Migratoria] = cm.sDescripcion,
    [Id Dependencia] = d.sSigla,
-   [Dependencia] = d.sNombre */
-
-   mm.sIdMovMigratorio
+   [Dependencia] = d.sNombre
 
 FROM SimMovMigra mm 
 JOIN SimPersona p ON mm.uIdPersona = p.uIdPersona

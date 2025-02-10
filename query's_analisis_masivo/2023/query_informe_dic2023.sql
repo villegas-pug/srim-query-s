@@ -9,9 +9,9 @@ GO
 
 
 -- Caso 1: Trámites con estado diferente a aprobado en pre-aprobación y con estado de trámite en `A` ...
--- SELECT * FROM SimPreTramiteInm spti WHERE spti.sNumeroTramite = 'CS230007675'
-SELECT * FROM SimTipoTramite stt WHERE stt.sDescripcion LIKE '%prorr%'
-SELECT 
+-- Se establece como regla de calidad que los trámites CCM, CPP y RS109, cuyo estado sea diferente de APROBADO en la etapa de pre-aprobación, no deben tener un estado de trámite APROBADO.
+
+SELECT
 
    -- 1
    [Nombres] = sper.sNombre,
@@ -58,15 +58,16 @@ FROM (
       st.sNumeroTramite,
       sti.sEstadoActual,
       spti.sEstadoPre,
-      [nFila_Pre] = ROW_NUMBER() OVER (PARTITION BY spti.sNumeroTramite ORDER BY spti.dFechaPre DESC)
+      [nFilaPre] = ROW_NUMBER() OVER (PARTITION BY spti.sNumeroTramite ORDER BY spti.dFechaPre DESC)
    FROM SimTramite st
    JOIN SimTramiteInm sti ON st.sNumeroTramite = sti.sNumeroTramite
    JOIN SimPreTramiteInm spti ON st.sNumeroTramite = spti.sNumeroTramite
    WHERE
       st.bCancelado = 0
+      AND spti.bActivo = 1
       AND st.uIdPersona != '00000000-0000-0000-0000-000000000000'
       AND sti.sEstadoActual = 'A'
-      AND NOT EXISTS (
+      AND NOT EXISTS ( -- No registra RECONSIDERACION o APELACION.
 
          SELECT 
             TOP 1 1
@@ -83,15 +84,16 @@ FROM (
 JOIN SimPersona sper ON t.uIdPersona = sper.uIdPersona
 JOIN SimTipoTramite stt ON t.nIdTipoTramite = stt.nIdTipoTramite
 WHERE
-   t.nFila_Pre = 1
+   t.nFilaPre = 1
    AND t.sEstadoPre != 'A'
 
 -- Test ...
-SELECT * FROM SimPreTramiteInm spti WHERE spti.sNumeroTramite = 'LM220074267'
+SELECT * FROM SimPreTramiteInm spti WHERE spti.sNumeroTramite = 'LM231048994'
 
 -- Caso 2: Más de 2 Citas de PAS-E mismo año, mes y direferente número de recibo ...
 -- Caso 2: Más de 2 Citas de PAS-E mismo año, mes y direferente número de recibo ...
 
+-- Se establece como regla de calidad que los títulos de nacionalidad entregados deben registrar el estado de trámite Aprobado.
 -- 4. Títulos de nacionalidad entregados con estado de trámite diferente a `A` ...
 -- 4.1
 SELECT
@@ -223,7 +225,6 @@ JOIN SimEtapa se ON setn.nIdEtapa = se.nIdEtapa
 WHERE setn.sNumeroTramite = 'LM120071640'
 
 -- Caso 6: Eliminar registros duplicados sin imagenes, fotos, trámites, movimientos migratorios, etc.
-
 -- 6.1
 DROP TABLE IF EXISTS #tmp_sim_duplext
 SELECT 
@@ -244,10 +245,6 @@ INTO #tmp_sim_duplext FROM (
 ) e
 WHERE
    e.nDupl >= 2
-
--- Test ...
-SELECT TOP 10 * FROM #tmp_sim_duplext d
-WHERE d.sIdPersona LIKE '%[ ]%'
 
 -- 6.2: ...
 BEGIN 

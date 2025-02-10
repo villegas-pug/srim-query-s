@@ -1,8 +1,7 @@
 USE SIM
 GO
 
--- 1. Registros de ciudadanos iguales en el Control Migratorio con una diferencia en minutos en la fecha de control, distinta identificador de persona
---    respectivamente e igual nacionalidad.
+-- 1. Duplicidad de registros en el control migratorio de ciudadanos que presentan el mismo tipo de movimiento, nacionalidad y fecha de control, pero con una diferencia de minutos, asociados a otro registro de identidad perteneciente a la misma persona.
 -- ==================================================================================================================================================================
 
 -- 1.1. Encontrar multiplicidad registros.
@@ -313,8 +312,7 @@ ORDER BY
 -- ==================================================================================================================================================================
 
 
--- 2. Registros de ciudadanos iguales en el Control Migratorio con una diferencia en minutos en la fecha de control, distinta identificador de persona 
---    respectivamente, distinto documento y distinta nacionalidad.
+-- 2. Duplicidad de registros en el control migratorio de ciudadanos que presentan el mismo tipo de movimiento y fecha de control, con una diferencia de minutos, pero asociados a otro registro de identidad con una nacionalidad diferente, perteneciente a la misma persona.
 -- ==================================================================================================================================================================
 
 -- 2.1. Encontrar multiplicidad registros identicos

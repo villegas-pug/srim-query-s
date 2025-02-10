@@ -893,6 +893,7 @@ PIVOT (
    COUNT(s3.nIdSolicitudCue) FOR s3.[nMesEtapa] IN ([1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [11], [12])
 ) pv
 
+
 -- 2. Año
 SELECT pv.* 
 FROM (
@@ -997,13 +998,18 @@ WHERE
    )
 
 
+-- Por fecha de solicitud
+SELECT pv.*
+FROM (
+   SELECT
+      s.nIdSolicitudCue,
+      [nMesSolicitud] = DATEPART(MM, s.dFechaSolicitud)
+   FROM SimSolicitudCUE s
+   WHERE 
+      s.bActivo = 1
+      AND s.dFechaSolicitud BETWEEN '2024-01-01 00:00:00.000' AND '2024-12-31 23:59:59.998'
 
-SELECT 
-   mm.sIdDependencia,
-   COUNT(1) 
-FROM SimMovMigra mm
-WHERE 
-   mm.sIdModuloDigita = 'SIM-MCM'
-GROUP BY
-   mm.sIdDependencia
-ORDER BY 2 DESC
+) f
+PIVOT (
+   COUNT(f.nIdSolicitudCue) FOR f.[nMesSolicitud] IN ([1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [11], [12])
+) pv

@@ -8,7 +8,7 @@ GO
 --> 2. Personas duplicadas en movimientos migratorios
 -- ============================================================================================================================================================
 
--- 2.1 Personas duplicadas con movimientos migratorios.
+-- 2.1 Personas duplicadas:
 -- EXEC sp_help SimPersona
 DROP TABLE IF EXISTS #tmp_dupl_personas
 SELECT 

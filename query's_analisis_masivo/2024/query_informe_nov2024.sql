@@ -28,7 +28,6 @@ WHERE
    AND mm.sIdDependencia IN ('25') -- Lima
    AND mm.dFechaControl >= '2024-01-01 00:00:00.000'
 
-
 -- =====================================================================================================================================================================
 
 -- 2. Se define como regla que, las dependencias de Puesto de Control Fronterizo, deben excluir el transporte aéreo de sus registros de movimientos.

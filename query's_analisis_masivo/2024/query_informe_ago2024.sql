@@ -76,7 +76,7 @@ WHERE
 
 -- =========================================================================================================================================================
 
--- 2. Se define como regla, que la fecha de nacimiento de [SimPersona], debe ser menor a la fecha actual.
+-- 2. Se define como regla, que la fecha de nacimiento de los ciudadanos registrados en la base de datos SIM debe ser anterior a la fecha actual.
 -- =========================================================================================================================================================
 
 -- 2.1
@@ -146,27 +146,9 @@ WHERE
          AND cm.sDescripcion LIKE '%trab%'
    )
 
--- 3.2
-SELECT
-   d.sSigla
-FROM SimTramite t
-JOIN SimTramiteInm ti ON t.sNumeroTramite = ti.sNumeroTramite
-JOIN SimCambioCalMig ccm ON t.sNumeroTramite = ccm.sNumeroTramite
-JOIN SimDependencia d ON t.sIdDependencia = d.sIdDependencia
-WHERE
-   t.bCancelado = 0
-   AND ti.sEstadoActual = 'A'
-   AND (ti.nIdOrganizacion IS NULL OR ti.nIdOrganizacion = '' OR ti.nIdOrganizacion = 0)
-   AND ccm.nIdCalSolicitada IN (
-      SELECT cm.nIdCalidad
-      FROM SimCalidadMigratoria cm
-      WHERE 
-         cm.bActivo = 1
-         AND cm.sDescripcion LIKE '%trab%'
-   )
+
 -- =============================================================================================================================================
 
--- 4. Se define como regla, que los documentos de viaje `PAS` en el registro de salida del control migratorio, deben estar vigentes.
 -- 4. Se establece como regla que los documentos de viaje Pasaporte Electrónico en el registro de salida del control migratorio no deben estar vencidos ni tener una fecha de vencimiento dentro de los próximos 6 meses.
 -- =============================================================================================================================================
 
@@ -191,7 +173,7 @@ CREATE NONCLUSTERED INDEX ix_tmp_pas_e_datos
 -- 28,412
 SELECT
 
-   /* [Id Persona] = pe.uIdPersona,
+   [Id Persona] = pe.uIdPersona,
    [Nombres] = pe.sNombre,
    [Apellido 1] = pe.sPaterno,
    [Apellido 2] = pe.sMaterno,
@@ -218,9 +200,7 @@ SELECT
                                     WHERE
                                        ei.uIdPersona = mm.uIdPersona
                                        AND ei.sPasNumero = mm.sNumeroDoc
-   ) */
-   -- mm.sIdMovMigratorio
-   COUNT(1)
+   )
 
 FROM SIM.dbo.SimMovMigra mm
 JOIN SimPersona pe ON mm.uIdPersona = pe.uIdPersona
@@ -275,7 +255,7 @@ WHERE
 -- 5.1
 SELECT
 
-   /* [Id Persona] = pe.uIdPersona,
+   [Id Persona] = pe.uIdPersona,
    [Nombres] = pe.sNombre,
    [Apellido 1] = pe.sPaterno,
    [Apellido 2] = pe.sMaterno,
@@ -289,12 +269,11 @@ SELECT
    [Fecha Movimiento] = mm.dFechaControl,
    [Documento] = mm.sIdDocumento,
    [Número Documento] = mm.sNumeroDoc,
-   [Dependencia] = d.sNombre */
-   -- mm.sIdMovMigratorio
-   COUNT(1)
+   [Dependencia] = d.sNombre
+
 FROM SIM.dbo.SimMovMigra mm
-/* JOIN SimPersona pe ON mm.uIdPersona = pe.uIdPersona
-JOIN SimDependencia d ON mm.sIdDependencia = d.sIdDependencia */
+JOIN SimPersona pe ON mm.uIdPersona = pe.uIdPersona
+JOIN SimDependencia d ON mm.sIdDependencia = d.sIdDependencia
 WHERE 
    mm.bAnulado = 0
    AND mm.bTemporal = 0

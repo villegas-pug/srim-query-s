@@ -2,7 +2,7 @@ USE CITASPAS
 GO
 
 -- Caso 2: Citas ...
-
+-- Se establece como regla de calidad que cada cita para pasaportes electrónicos sea única y no pueda duplicarse con la misma fecha y hora para un mismo ciudadano.
 -- 2.1: Igual fecha y hora cita ...
 SELECT
    [Nombres] = c1.sNomBeneficiario,
@@ -46,6 +46,7 @@ ORDER BY
 SELECT TOP 1 * FROM SimCitaWebNacional scn
 
 -- 2.2: Igual fecha y diferente hora cita ...
+-- Se establece como regla de calidad que cada cita para pasaportes electrónicos sea única y no pueda duplicarse con la misma fecha para un mismo ciudadano.
 SELECT 
 
    [Nombres] = c2.sNomBeneficiario,
