@@ -81,7 +81,7 @@ WHERE
 
 
 -- Test ...
--- 1
+-- 1. 
 SELECT * FROM BD_SIRIM.dbo.RimNacionalizados n
 WHERE
 	n.Estado = 'A'

@@ -7,6 +7,7 @@ GO */
 -- » CREATE-USER'S: 
 -- -----------------------------------------------------------------------------------------------------------------------------
 
+SELECT * FROM SidUsuario
 SELECT * FROM SgcdUsuarios
 
 /* DELETE FROM SgcdUsuarios
@@ -19,7 +20,6 @@ WHERE uIdUsuario NOT IN ('3d2220e5-a2f9-4117-b6d0-67eb04984c24') */
 
 -- » CREATE-CREDENTIALS:
 -- -----------------------------------------------------------------------------------------------------------------------------
-
 UPDATE SgcdUsuarios
 	SET sLogin = LOWER(d.sNombre),
 		 sNombres = LOWER(d.sNombre)

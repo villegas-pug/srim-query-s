@@ -1,11 +1,11 @@
 --==================================================================================================================================================================
--- Extraer datos de análisis: Base India
+-- Extraer datos de anï¿½lisis: Base India
 --==================================================================================================================================================================
 
 USE SIM
 GO
 
---STEP-01: Crear tabla física.
+--STEP-01: Crear tabla fï¿½sica.
 DROP TABLE IF EXISTS tmp_ctrlmig_india
 CREATE TABLE tmp_ctrlmig_india
 (
@@ -90,3 +90,11 @@ SELECT * FROM SimTipoDocumento
 SELECT * FROM SimDocumento WHERE sIdDocumento LIKE 'L%'
 
 SELECT NULLIF('5', 5)
+
+
+SELECT * 
+FROM SimPersona pe
+WHERE pe.uIdPersona = '0c71112b-0927-4db5-8da8-63c4b644af17'
+
+
+EXEC [BD_SIRIM].[dbo].USP_SEG_GEN_VALIDACIONUNION

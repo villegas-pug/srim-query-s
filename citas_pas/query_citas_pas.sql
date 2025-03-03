@@ -45,6 +45,8 @@ ORDER BY
 -- Test ...
 SELECT TOP 1 * FROM SimCitaWebNacional scn
 
+SELECT TOP 10 * FROM SimCitaWebNacional
+
 -- 2.2: Igual fecha y diferente hora cita ...
 -- Se establece como regla de calidad que cada cita para pasaportes electrónicos sea única y no pueda duplicarse con la misma fecha para un mismo ciudadano.
 SELECT 

@@ -40,3 +40,47 @@ DROP TABLE IF EXISTS #tmp_nac
 SELECT * FROM #tmp_nac
 
 --=============================================================================================================================*/
+
+-- 2. Trámites de nacionalización por estados
+--===========================================================================================================================
+
+SELECT
+
+	[Año Trámite] = DATEPART(YYYY, st.dFechaHora),
+	[Estado] = (
+					CASE tn.sEstadoActual
+						WHEN 'P' THEN 'PENDIENTE'
+						WHEN 'R' THEN 'ANULADO'
+						WHEN 'D' THEN 'DENEGADO'
+						WHEN 'A' THEN 'APROBADO'
+						WHEN 'E' THEN 'DESISTIDO'
+						WHEN 'B' THEN 'ABANDONO'
+						WHEN 'N' THEN 'NO PRESENTADA'
+					END
+	),
+	[Tipo Trámite] = stt.sDescripcion,
+	[Total] = COUNT(1)
+
+FROM SimTramite st
+JOIN SimTipoTramite stt ON st.nIdTipoTramite = stt.nIdTipoTramite
+JOIN SimTramiteNac tn ON st.sNumeroTramite = tn.sNumeroTramite
+WHERE
+	st.bCancelado = 0
+	AND stt.nIdTipoTramite IN (69, 71, 72, 73, 76, 78, 79, 86) -- 86 | RENUNCIA A LA NACIONALIDAD PERUANA
+GROUP BY
+	DATEPART(YYYY, st.dFechaHora),
+	CASE tn.sEstadoActual
+		WHEN 'P' THEN 'PENDIENTE'
+		WHEN 'R' THEN 'ANULADO'
+		WHEN 'D' THEN 'DENEGADO'
+		WHEN 'A' THEN 'APROBADO'
+		WHEN 'E' THEN 'DESISTIDO'
+		WHEN 'B' THEN 'ABANDONO'
+		WHEN 'N' THEN 'NO PRESENTADA'
+	END,
+	stt.sDescripcion
+		
+
+
+--===========================================================================================================================
+

@@ -13,20 +13,40 @@ WHERE
 
 -- 2. SimPersona
 -- ARANGOITIA HORNA BELGICA SOLANGE
+
+-- Parecidos: Arzizi Majid
+--    → AZIZI MAJID | 89a62549-194d-4319-9e79-b5b5ffb170ad | PERUANO
+--    → AZIZI MAJID | 711c5235-6cdf-4556-a358-5e4eb437bc3f | IRANI
+
+-- 711c5235-6cdf-4556-a358-5e4eb437bc3f
+-- 89a62549-194d-4319-9e79-b5b5ffb170ad
+-- -- MIRZAEL MAJID | 22-10-1963
+
+SELECT * 
+FROM SimDocPersona dp
+WHERE
+   dp.sNumero IN (
+                     SELECT d.sNumero
+                     FROM SimDocPersona d
+                     WHERE d.uIdPersona  = 'e91351ac-054d-4f1b-9c65-8bcced9f6112'
+   )
+
+
 SELECT
    pe.sIdPaisNacionalidad, 
    pe.* 
 FROM SimPersona pe
 WHERE 
    -- 1
-   pe.sNombre LIKE '%SOL%'
+   pe.sNombre LIKE 'MAJI%'
+   -- pe.sNombre LIKE 'MAJID'
    -- pe.sNombre LIKE '%BELGICA SOLANGE%'
    -- pe.sNombre LIKE '%SOL%'
-   AND pe.sPaterno LIKE '%ARAN%'
+   AND pe.sPaterno LIKE 'MIRZ%'
    -- AND pe.sMaterno LIKE '%HOR%'
-   -- AND pe.sIdPaisNacionalidad = 'RDO'
+   AND pe.sIdPaisNacionalidad = 'PER'
    -- AND pe.uIdPersona = 'b7a1307e-e52f-49a4-aa1c-03dd1df45508'
-   AND CAST(pe.dFechaNacimiento AS DATE) = '1986-01-28'
+   AND CAST(pe.dFechaNacimiento AS DATE) = '1963-10-22'
 
 
 SELECT * 
@@ -199,19 +219,36 @@ SELECT
 
    -- Tramites CPP ...
    [Trámites] = (
+                     SELECT [Tramite] = CONCAT(tf.NumeroTramite, ', Estado: ', tf.EstadoActual, ', Tipo: ', tf.TipoTramite, ', Fecha: ', tf.FechaTramite, '| ')
+                     FROM (
 
-                     SELECT
-                        [NumeroTramite] = st.sNumeroTramite,
-                        [EstadoActual] = sti.sEstadoActual,
-                        [TipoTramite] = stt.sDescripcion
-                     FROM SimTramite st
-                     JOIN SimTramiteInm sti ON st.sNumeroTramite = sti.sNumeroTramite
-                     JOIN SimTipotramite stt ON st.nIdTipoTramite = stt.nIdTipoTramite
-                     WHERE
-                        st.bCancelado = 0
-                        AND st.uIdPersona = pe.uIdPersona
-                        -- AND st.nIdTipoTramite IN (113, 126) -- PERMISO TEMPORAL DE PERMANENCIA - RS109 | 113 - CPP
-                     FOR XML PATH('')
+                        SELECT
+                           [NumeroTramite] = st.sNumeroTramite,
+                           [EstadoActual] = sti.sEstadoActual,
+                           [TipoTramite] = stt.sDescripcion,
+                           [FechaTramite] = CAST(st.dFechaHora AS DATE)
+                        FROM SimTramite st
+                        JOIN SimTramiteInm sti ON st.sNumeroTramite = sti.sNumeroTramite
+                        JOIN SimTipotramite stt ON st.nIdTipoTramite = stt.nIdTipoTramite
+                        WHERE
+                           st.bCancelado = 0
+                           AND st.uIdPersona = pe.uIdPersona
+                           -- AND st.nIdTipoTramite IN (113, 126) -- PERMISO TEMPORAL DE PERMANENCIA - RS109 | 113 - CPP
+                        UNION ALL
+                        SELECT
+                           [NumeroTramite] = st.sNumeroTramite,
+                           [EstadoActual] = tn.sEstadoActual,
+                           [TipoTramite] = stt.sDescripcion,
+                           [FechaTramite] = CAST(st.dFechaHora AS DATE)
+                        FROM SimTramite st
+                        JOIN SimTramiteNac tn ON st.sNumeroTramite = tn.sNumeroTramite
+                        JOIN SimTipotramite stt ON st.nIdTipoTramite = stt.nIdTipoTramite
+                        WHERE
+                           st.bCancelado = 0
+                           AND st.uIdPersona = pe.uIdPersona
+                           -- AND st.nIdTipoTramite IN (113, 126) -- PERMISO TEMPORAL DE PERMANENCIA - RS109 | 113 - CPP
+
+                     ) tf FOR XML PATH('')
 
                   ),
 
@@ -334,9 +371,8 @@ LEFT JOIN [dbo].[SimDireccionPDA] d ON a.nIdCitaVerifica = d.nIdCitaVerifica
 -- JOIN SimTipoTramite tt ON a.nIdTipoTramite = tt.nIdTipoTramite
 WHERE
    pe.uIdPersona IN (
-      'e485c840-0540-456b-a726-d362f30c9214',
-      'da95744e-980f-4ed3-85f5-052f3567bdbe',
-      '34bbcbb3-0b07-4591-a248-7d3c003bc419'
+      '711c5235-6cdf-4556-a358-5e4eb437bc3f',
+      '89a62549-194d-4319-9e79-b5b5ffb170ad'
    )
 
 
@@ -349,5 +385,17 @@ EXEC sp_help SImMovMIgra
 1. Duplicados de personas creadas en control migratorio.
 2. Datos incompletos registros en SimPersona desde el control migratorio.
 
-
 */
+
+SELECT * 
+FROM SimTituloNacionalidad t
+WHERE t.uIdPersona IN (
+   '711c5235-6cdf-4556-a358-5e4eb437bc3f',
+   '89a62549-194d-4319-9e79-b5b5ffb170ad'
+)
+
+SELECT * 
+FROM SimTramite t
+WHERE t.sNumeroTramite = 'LM180149859'
+
+

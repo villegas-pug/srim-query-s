@@ -263,9 +263,9 @@ SELECT
    [xImagen] = CAST(ie.xImagen AS VARBINARY(MAX))
 FROM SIM.dbo.[SimImagen] ie
 JOIN SimPersona p ON ie.uIdPersona = p.uIdPersona
-LEFT JOIN SimDedo d ON ie.s .sId Dedo = d.sIdDedo
+LEFT JOIN SimDedo d ON ie.sIdDedo = d.sIdDedo
 WHERE
-   ie.uIdPersona = '962071df-6e5c-44a8-bdc3-d94563e5205f'
+   ie.uIdPersona = 'e91351ac-054d-4f1b-9c65-8bcced9f6112'
 
 SELECT * 
 FROM SimPersona pe
@@ -280,7 +280,7 @@ WHERE
    AND dp.sNumero = '71591003'
    
 
-DECLARE @idPer UNIQUEIDENTIFIER = '962071df-6e5c-44a8-bdc3-d94563e5205f'
+DECLARE @idPer UNIQUEIDENTIFIER = 'e91351ac-054d-4f1b-9c65-8bcced9f6112'
 IF EXISTS(SELECT TOP 1 1 FROM SimImagenExtranjero ie WHERE ie.uIdPersona = @idPer)
 BEGIN
    SELECT i.*

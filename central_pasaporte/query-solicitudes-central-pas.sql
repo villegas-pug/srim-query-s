@@ -28,8 +28,8 @@ ORDER BY 2 DESC
 
 -- Buscar persona por número pasaporte:
 
--- 1.	cuantos pasaportes por persona  (ROY)
-
+-- 1.	Pasaportes entregados por persona.
+-- ===================================================================================================
 -- 1.1 Cetral
 SELECT 
    d.*,
@@ -41,11 +41,12 @@ JOIN CENTRAL_DB.CNT_SCHEMA.DOCUMENTO d ON s.NUMERO_DOC = d.DOCUMENTO_NUMERO
 JOIN CENTRAL_DB.CNT_SCHEMA.PERSONA p ON s.PERSONA_ID = p.ID
 JOIN CENTRAL_DB.CNT_SCHEMA.DATOS_RENIEC r ON p.DNI = r.DNI
 WHERE
-   -- s.PILOTO = 0
-   -- AND s.ESTADO = 'ENTREGADA'
-   -- AND d.FECHA_EMISION BETWEEN '2019-01-01 00:00:00.000' AND '2024-09-26 23:59:59.999' 
-   s.NUMERO_DOC = '116000033'
+   s.ESTADO = 'ENTREGADA'
+   AND d.FECHA_EMISION BETWEEN '2019-01-01 00:00:00.000' AND '2024-09-26 23:59:59.999' 
    
+-- ===================================================================================================
+
+
 SELECT TOP 10 * 
 FROM CENTRAL_DB.CNT_SCHEMA.DATOS_RENIEC
 
